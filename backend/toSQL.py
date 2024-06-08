@@ -4,8 +4,7 @@ import sqlite3
 # read exel file
 df = pd.read_excel('data/employeepositionroster_03312024.xls')
 # MAKE SURE THIS IS CORRECT!!
-
-IMPORT_YEAR = 2024
+IMPORT_DATE = '2024-03-31'
 
 
 df.columns = ['posNum', 'deptID', 'department', 'FTE', 'ClsIndc', 'annualSalary',
@@ -44,7 +43,7 @@ CREATE TABLE IF NOT EXISTS payroll (
     annualSalary REAL,
     annualSalaryFTE REAL,
     annualBenefit REAL,
-    year INTEGER DEFAULT 2024,
+    date DATE,
     ClsIndc TEXT,
     FTE REAL,
     posNum TEXT,
@@ -55,7 +54,7 @@ CREATE TABLE IF NOT EXISTS payroll (
 )
 ''')
 
-# insert unique departments into the departments table
+# insert unique departments iis DEFAULT '2024-03-31' needed if i have nto the departments table
 departments_df = df[['deptID', 'department']].drop_duplicates().reset_index(drop=True)
 departments_df.columns = ['cpsID', 'name']
 departments_df.to_sql('departments', conn, if_exists='append', index=False)
@@ -81,7 +80,7 @@ print("mapped job_id column:\n", df[['jobCode', 'job_id']].drop_duplicates())
 
 # select relevant columns for the payroll table and insert into database
 payroll_df = df[['name', 'annualSalary', 'annualSalaryFTE', 'annualBenefit', 'ClsIndc', 'FTE', 'posNum', 'dept_id', 'job_id']]
-payroll_df['year'] = IMPORT_YEAR
+payroll_df['date'] = IMPORT_DATE
 
 payroll_df.to_sql('payroll', conn, if_exists='append', index=False)
 
