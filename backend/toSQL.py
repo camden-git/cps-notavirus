@@ -1,30 +1,17 @@
 import pandas as pd
 import sqlite3
-
-# read exel file
-df = pd.read_excel('data/employeepositionroster_03312024.xls')
-# MAKE SURE THIS IS CORRECT!!
-IMPORT_DATE = '2024-03-31'
-
-
-df.columns = ['posNum', 'deptID', 'department', 'FTE', 'ClsIndc', 'annualSalary',
-              'annualSalaryFTE', 'annualBenefit', 'jobCode', 'jobTitle', 'name']
-
-# clean up spaces
-df['name'] = df['name'].str.strip()
-df['deptID'] = df['deptID'].astype(str).str.strip()
-df['jobCode'] = df['jobCode'].astype(str).str.strip()
+import os
 
 conn = sqlite3.connect('payroll.db')
 cursor = conn.cursor()
 
-# create tables
-# TODO: refactor this shit
+# migrations lol
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS departments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     cpsID TEXT,
-    name TEXT
+    name TEXT,
+    UNIQUE(cpsID, name) ON CONFLICT IGNORE
 )
 ''')
 
@@ -32,7 +19,8 @@ cursor.execute('''
 CREATE TABLE IF NOT EXISTS jobs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT,
-    title TEXT
+    title TEXT,
+    UNIQUE(code, title) ON CONFLICT IGNORE
 )
 ''')
 
@@ -54,36 +42,69 @@ CREATE TABLE IF NOT EXISTS payroll (
 )
 ''')
 
-# insert unique departments iis DEFAULT '2024-03-31' needed if i have nto the departments table
-departments_df = df[['deptID', 'department']].drop_duplicates().reset_index(drop=True)
-departments_df.columns = ['cpsID', 'name']
-departments_df.to_sql('departments', conn, if_exists='append', index=False)
+for file_name in os.listdir('data'):
+    if file_name.endswith('.xls'):
+        file_path = os.path.join('data', file_name)
+        import_date = file_name.replace('.xls', '')  # rxtract date from filename
+        
+        # read Excel file
+        df = pd.read_excel(file_path, skiprows=1)
+        
+        # handle columns based on import date
+        if import_date <= '2015-12-31':
+            # rename columns and adjust offset for files at or before 2015-12-31
+            df.columns = ['posNum', 'deptID', 'department', 'FTE', 'annualSalary',
+                          'annualSalaryFTE', 'annualBenefit', 'jobCode', 'jobTitle', 'name']
+            df['ClsIndc'] = 'DATA_UNKNOWN'  # set 'ClsIndc' to 'DATA_UNKNOWN' for older files
+        else:
+            # rename columns for convenience
+            df.columns = ['posNum', 'deptID', 'department', 'FTE', 'ClsIndc', 'annualSalary',
+                          'annualSalaryFTE', 'annualBenefit', 'jobCode', 'jobTitle', 'name']
+        
+        # clean up spaces
+        df['name'] = df['name'].str.strip()
+        df['deptID'] = df['deptID'].astype(str).str.strip()
+        df['jobCode'] = df['jobCode'].astype(str).str.strip()
+        
+        # fill missing values with empty strings or -1 for money-related columns
+        money_columns = ['annualSalary', 'annualSalaryFTE', 'annualBenefit']
+        df[money_columns] = df[money_columns].fillna(-1)
+        df = df.fillna('')
+        
+        # insert unique departments into the departments table
+        departments_df = df[['deptID', 'department']].drop_duplicates().reset_index(drop=True)
+        departments_df.columns = ['cpsID', 'name']
+        departments_df.to_sql('temp_departments', conn, if_exists='replace', index=False)
 
-# insert unique jobs into the jobs table
-jobs_df = df[['jobCode', 'jobTitle']].drop_duplicates().reset_index(drop=True)
-jobs_df.columns = ['code', 'title']
-jobs_df.to_sql('jobs', conn, if_exists='append', index=False)
+        cursor.execute('''
+        INSERT OR IGNORE INTO departments (cpsID, name)
+        SELECT cpsID, name FROM temp_departments
+        ''')
 
-# get department and job IDs for foreign key references
-dept_id_map = pd.read_sql('SELECT id, cpsID FROM departments', conn).set_index('cpsID')['id'].to_dict()
-job_id_map = pd.read_sql('SELECT id, code FROM jobs', conn).set_index('code')['id'].to_dict()
+        # insert unique jobs into the jobs table
+        jobs_df = df[['jobCode', 'jobTitle']].drop_duplicates().reset_index(drop=True)
+        jobs_df.columns = ['code', 'title']
+        jobs_df.to_sql('temp_jobs', conn, if_exists='replace', index=False)
 
-print("department ID map:", dept_id_map)
-print("job ID map:", job_id_map)
+        cursor.execute('''
+        INSERT OR IGNORE INTO jobs (code, title)
+        SELECT code, title FROM temp_jobs
+        ''')
 
-# map the foreign keys to the original dataframe
-df['dept_id'] = df['deptID'].map(dept_id_map)
-df['job_id'] = df['jobCode'].map(job_id_map)
+        # retrieve department and job IDs for foreign key references
+        dept_id_map = pd.read_sql('SELECT id, cpsID FROM departments', conn).set_index('cpsID')['id'].to_dict()
+        job_id_map = pd.read_sql('SELECT id, code FROM jobs', conn).set_index('code')['id'].to_dict()
 
-print("mapped dept_id column:\n", df[['deptID', 'dept_id']].drop_duplicates())
-print("mapped job_id column:\n", df[['jobCode', 'job_id']].drop_duplicates())
+        # map the foreign keys to the original dataframe
+        df['dept_id'] = df['deptID'].map(dept_id_map)
+        df['job_id'] = df['jobCode'].map(job_id_map)
 
-# select relevant columns for the payroll table and insert into database
-payroll_df = df[['name', 'annualSalary', 'annualSalaryFTE', 'annualBenefit', 'ClsIndc', 'FTE', 'posNum', 'dept_id', 'job_id']]
-payroll_df['date'] = IMPORT_DATE
+        # select relevant columns for the payroll table and insert into database
+        payroll_df = df[['name', 'annualSalary', 'annualSalaryFTE', 'annualBenefit', 'ClsIndc', 'FTE', 'posNum', 'dept_id', 'job_id']]
+        payroll_df['date'] = import_date
 
-payroll_df.to_sql('payroll', conn, if_exists='append', index=False)
+        payroll_df.to_sql('payroll', conn, if_exists='append', index=False)
 
-# commit and close
+# commit changes and close the connection
 conn.commit()
 conn.close()
