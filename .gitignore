@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-backend/*
+backend/venv/
+backend/payroll.db
+backend/data/*
+!backend/data/.githold
