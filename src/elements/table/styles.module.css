@@ -1,0 +1,18 @@
+.table {
+    @apply w-full whitespace-nowrap text-left;
+
+    & td {
+        @apply py-4;
+    }
+
+    & th {
+        @apply py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8;
+    }
+    & thead {
+        @apply border-b border-white/10 text-sm leading-6 text-white;
+    }
+
+    & tbody {
+        @apply divide-y divide-white/5;
+    }
+}

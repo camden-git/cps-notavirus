@@ -25,5 +25,8 @@ dist-ssr
 
 backend/venv/
 backend/payroll.db
+backend/jobs.json
+backend/departments.json
+
 backend/data/*
 !backend/data/.githold
