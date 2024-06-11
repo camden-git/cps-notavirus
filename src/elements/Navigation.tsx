@@ -22,7 +22,9 @@ function Navigation() {
                 }
             >
                 <div className='absolute inset-x-0 top-full h-px bg-white opacity-10' />
-                <Logo />
+                <Link to='/'>
+                    <Logo />
+                </Link>
                 <div className='hidden lg:block lg:max-w-md lg:flex-auto'>
                     <Search />
                 </div>
@@ -32,7 +34,7 @@ function Navigation() {
                             {/*TODO: autogen?? */}
                             <TopLevelNavItem href='/'>API</TopLevelNavItem>
                             <TopLevelNavItem href='#'>Blog</TopLevelNavItem>
-                            <TopLevelNavItem href='#'>About</TopLevelNavItem>
+                            <TopLevelNavItem href='/about'>About</TopLevelNavItem>
                         </ul>
                     </nav>
                     <div className='hidden md:block md:h-5 md:w-px md:bg-white/15 md:mx-4' />

@@ -1,8 +1,9 @@
 import { Routes, Route, Link } from 'react-router-dom';
-import Index from './Index';
+import Index from './DataViews/Payroll/Index';
 import Navigation from './elements/Navigation';
 import HeroPattern from './elements/HeroPattern';
 import Footer from './elements/Footer';
+import About from './About';
 
 function NoMatch() {
     return (
@@ -26,6 +27,7 @@ export default function App() {
                         <main className='py-32 text-white'>
                             <Routes>
                                 <Route index element={<Index />} />
+                                <Route path='about' element={<About />} />
                                 <Route path='*' element={<NoMatch />} />
                             </Routes>
                         </main>

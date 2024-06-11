@@ -29,7 +29,7 @@ def get_payroll():
     FROM payroll p
     LEFT JOIN departments d ON p.dept_id = d.id
     LEFT JOIN jobs j ON p.job_id = j.id
-    ORDER BY p.date DESC
+    ORDER BY p.id ASC
     LIMIT ? OFFSET ?
     '''
     
@@ -40,7 +40,9 @@ def get_payroll():
     payroll_records = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
     conn.close()
     
-    return jsonify({'payrollRecords': payroll_records, 'current_page': page, 'max_page': max_page('payroll', per_page)})
+    pageInfo = max_page('payroll', per_page)
+    print(pageInfo)
+    return jsonify({'payrollRecords': payroll_records, 'current_page': page, 'max_page': pageInfo['max_page'], 'total_records': pageInfo['total_records']})
 
 
 
@@ -62,7 +64,8 @@ def get_jobs():
     jobs = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
     conn.close()
     
-    return jsonify({'jobs': jobs, 'current_page': page, 'max_page': max_page('jobs', per_page)})
+    pageInfo = max_page('jobs', per_page)
+    return jsonify({'jobs': jobs, 'current_page': page, 'max_page': pageInfo['max_page'], 'total_records': pageInfo['total_records']})
 
 
 @app.route('/api/departments', methods=['GET'])
@@ -82,7 +85,8 @@ def get_departments():
     departments = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
     conn.close()
     
-    return jsonify({'departments': departments, 'current_page': page, 'max_page': max_page('departments', per_page)})
+    pageInfo = max_page('departments', per_page)
+    return jsonify({'departments': departments, 'current_page': page, 'max_page': pageInfo['max_page'], 'total_records': pageInfo['total_records']})
 
 
 def max_page(table, per_page):
@@ -94,7 +98,7 @@ def max_page(table, per_page):
     print(total_records)
     conn.close()
     
-    return (total_records // per_page + 1)
+    return {'total_records': total_records, 'max_page': (total_records // per_page + 1)}
 
 
 if __name__ == '__main__':

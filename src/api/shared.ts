@@ -24,6 +24,7 @@ export type PayrollRecord = {
 
 export type PayrollInfo = {
     max_page: number;
+    total_records: number;
     payrollRecords: PayrollRecord[];
 };
 
@@ -41,43 +42,48 @@ export const getPayroll = async (page: number) => {
     }
 };
 
-
 export const usePayrollPagination = (initialPage: number = 1) => {
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [payrollData, setPayrollData] = useState<PayrollInfo | null>(null);
     const [error, setError] = useState<FetchError | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-  
+
     const fetchPayroll = useCallback(async (page: number) => {
-      setLoading(true);
-      setError(null);
-  
-      const result = await getPayroll(page);
-  
-      if ('error' in result) {
-        setError(result);
-      } else {
-        setPayrollData(result);
-      }
-  
-      setLoading(false);
+        setLoading(true);
+        setError(null);
+
+        const result = await getPayroll(page);
+
+        if ('error' in result) {
+            setError(result);
+        } else {
+            setPayrollData(result);
+        }
+
+        setLoading(false);
     }, []);
-  
+
     useEffect(() => {
-      fetchPayroll(currentPage);
+        fetchPayroll(currentPage);
     }, [currentPage, fetchPayroll]);
-  
+
     const nextPage = () => {
-      if (payrollData && currentPage < payrollData.max_page) {
-        setCurrentPage((prev) => prev + 1);
-      }
+        if (payrollData && currentPage < payrollData.max_page) {
+            setCurrentPage(prev => prev + 1);
+        }
     };
-  
+
     const prevPage = () => {
-      if (currentPage > 1) {
-        setCurrentPage((prev) => prev - 1);
-      }
+        if (currentPage > 1) {
+            setCurrentPage(prev => prev - 1);
+        }
     };
-  
-    return { payrollData, error, loading, currentPage, nextPage, prevPage };
-  };
+
+    const gotoPage = (toPage: number) => {
+        if (payrollData && toPage <= payrollData.max_page) {
+            setCurrentPage(toPage);
+        }
+    };
+
+    return { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage };
+};
