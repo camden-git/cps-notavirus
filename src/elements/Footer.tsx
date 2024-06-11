@@ -36,7 +36,8 @@ function Footer() {
         <footer className='mx-auto space-y-10 pb-16'>
             <div className='flex flex-col items-center justify-between gap-5 border-t pt-8 border-white/5 sm:flex-row'>
                 <p className='text-xs text-zinc-400'>
-                    &copy; {new Date().getFullYear()} notaviruslol.com. Licensed under the WTFPL.
+                    &copy; {new Date().getFullYear()} notaviruslol.com. Licensed under the WTFPL. Not affiliated with
+                    CPS.
                 </p>
                 <div className='flex gap-4'>
                     <SocialLink href='https://github.com/camden-git/cps-notavirus' icon={GitHubIcon}>

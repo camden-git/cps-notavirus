@@ -1,4 +1,3 @@
-import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 interface PaginationProps {
@@ -11,8 +10,15 @@ interface PaginationProps {
     gotoPage: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, loadedRecords, totalRecords, maxPage, prevPage, nextPage, gotoPage }) => {
-
+function Pagination({
+    currentPage,
+    loadedRecords,
+    totalRecords,
+    maxPage,
+    prevPage,
+    nextPage,
+    gotoPage,
+}: PaginationProps) {
     const getPageNumbers = (): (number | string)[] => {
         const maxPageNumbers = 7;
         const pageNumbers: (number | string)[] = [];
@@ -57,12 +63,9 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, loadedRecords, tot
         <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
             <div>
                 <p className='text-sm text-gray-300'>
-                    Showing{' '}
-                    <span className='font-medium'>{(currentPage - 1) * loadedRecords + 1}</span> to{' '}
-                    <span className='font-medium'>
-                        {Math.min(currentPage * loadedRecords, totalRecords)}
-                    </span>{' '}
-                    of <span className='font-medium'>{totalRecords}</span> results
+                    Showing <span className='font-medium'>{(currentPage - 1) * loadedRecords + 1}</span> to{' '}
+                    <span className='font-medium'>{Math.min(currentPage * loadedRecords, totalRecords)}</span> of{' '}
+                    <span className='font-medium'>{totalRecords}</span> results
                 </p>
             </div>
             <div>
@@ -112,6 +115,6 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, loadedRecords, tot
             </div>
         </div>
     );
-};
+}
 
 export default Pagination;

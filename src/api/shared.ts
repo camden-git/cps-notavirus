@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export const getAPI = (endpoint: string, offset: number) => `http://127.0.0.1:5000/api/${endpoint}?page=${offset}`;
+export const getAPI = (endpoint: string, offset: number) => `${import.meta.env.VITE_API_URL}/${endpoint}?page=${offset}`;
 
 interface RequestOptions extends RequestInit {
     headers?: Record<string, string>;

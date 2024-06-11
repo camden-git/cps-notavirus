@@ -4,14 +4,17 @@ import { Resources } from '../../elements/Resources';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { formatMoney } from '../../lib/formatters';
 import Pagination from './Pagnation';
+import Title from '../../elements/Title';
 
 function Index() {
     const { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage } = usePayrollPagination();
 
     return (
         <>
-            <h1 className='text-white font-bold text-2xl leading-8 mb-2'>CPS Staff Payroll</h1>
-            <p className='text-gray-400 text-base '>Blurb here</p>
+            <Title
+                title='CPS Staff Payroll'
+                description='This website is still in beta; the majority of features are still unfinished'
+            />
             <Resources />
             <div>
                 {loading ? (
