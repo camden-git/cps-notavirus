@@ -1,26 +1,10 @@
 import { Table } from './elements/table';
-import { FetchError, PayrollInfo, PayrollRecord, getPayroll, usePayrollPagination } from './api/shared';
-import { useEffect, useState } from 'react';
+import { PayrollRecord, usePayrollPagination } from './api/shared';
 import { Resources } from './elements/Resources';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 function Index() {
-    const [data, setData] = useState<PayrollInfo | FetchError | null>(null);
     const { payrollData, error, loading, currentPage, nextPage, prevPage } = usePayrollPagination();
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getPayroll(1);
-                if (result) {
-                    setData(result);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     return (
         <>
