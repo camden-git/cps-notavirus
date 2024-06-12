@@ -5,6 +5,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+LATEST_DATAFRAME = '2023-09-30'
+
 # Function to connect to the SQLite database
 def connect_db():
     return sqlite3.connect('payroll.db')
@@ -20,23 +22,7 @@ def get_payroll():
     conn = connect_db()
     cursor = conn.cursor()
     
-    # LEFT JOIN (
-    #   SELECT name, MAX(date) as last_seen_date
-    #   - select the name to identify the person uniquely
-    #   - select the maximum date (latest date) for each person
-    #   FROM payroll
-    #   GROUP BY name
-    #   - group by name to get the latest date for each person
-    # ) last_seen ON p.name = last_seen.name
-    # - join the subquery on name to get the latest record
-    #
-    # WHERE p.date = last_seen.last_seen_date
-    # - filter to ensure only the latest records are selected
-    #
-    # AND p.name LIKE ?
-    # - add a fuzzy search condition on the name column if a name query is provided
-    
-    sql_query = '''
+    base_query = '''
     SELECT 
         p.*,  
         d.id AS dept_id,  
@@ -58,21 +44,44 @@ def get_payroll():
     '''
     
     params = []
-    if name_query:
-        sql_query += ' AND p.name LIKE ?'
-        params.append('%' + name_query + '%')
     
-    sql_query += ' ORDER BY p.date DESC LIMIT ? OFFSET ?'
+    if name_query:
+        # split the name query into first and last names
+        names = name_query.split()
+        
+        # construct conditions for both formats: first last and last, first
+        conditions = [
+            'p.name LIKE ?',
+            'p.name LIKE ?'
+        ]
+        
+        params.extend(['%' + ' '.join(names) + '%', '%' + ', '.join(reversed(names)) + '%'])
+        
+        base_query += ' AND (' + ' OR '.join(conditions) + ')'
+    
+    # count total records based on the constructed query
+    count_query = f'SELECT COUNT(*) FROM ({base_query})'
+    cursor.execute(count_query, params)
+    total_records = cursor.fetchone()[0]
+    
+    # construct the final query for fetching paginated records
+    final_query = f'{base_query} ORDER BY p.date DESC LIMIT ? OFFSET ?'
     params.extend([per_page, offset])
     
-    cursor.execute(sql_query, params)
-    
+    cursor.execute(final_query, params)
     payroll_records = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+    
     conn.close()
     
-    pageInfo = max_page('payroll', per_page)
+    max_page = (total_records + per_page - 1) // per_page
     
-    return jsonify({'payrollRecords': payroll_records, 'current_page': page, 'max_page': pageInfo['max_page'], 'total_records': pageInfo['total_records']})
+    return jsonify({
+        'payrollRecords': payroll_records,
+        'current_page': page,
+        'max_page': max_page,
+        'total_records': total_records,
+        'latest_dataframe': LATEST_DATAFRAME
+    })
 
 
 

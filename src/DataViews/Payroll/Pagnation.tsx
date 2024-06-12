@@ -1,4 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { useEffect, useState } from 'react';
 
 interface PaginationProps {
     currentPage: number;
@@ -19,45 +20,50 @@ function Pagination({
     nextPage,
     gotoPage,
 }: PaginationProps) {
-    const getPageNumbers = (): (number | string)[] => {
-        const maxPageNumbers = 7;
-        const pageNumbers: (number | string)[] = [];
+    const [pageNumbers, setPageNumbers] = useState<(number | string)[]>([]);
 
-        if (maxPage <= maxPageNumbers) {
-            for (let i = 1; i <= maxPage; i++) {
-                pageNumbers.push(i);
-            }
-        } else {
-            let startPage = Math.max(currentPage - 3, 1);
-            const endPage = Math.min(startPage + maxPageNumbers - 1, maxPage);
+    useEffect(() => {
+        const getPageNumbers = (): (number | string)[] => {
+            const maxPageNumbers = 7;
+            const numbers: (number | string)[] = [];
 
-            if (endPage - startPage < maxPageNumbers - 1) {
-                startPage = Math.max(endPage - maxPageNumbers + 1, 1);
-            }
+            if (maxPage <= maxPageNumbers) {
+                for (let i = 1; i <= maxPage; i++) {
+                    numbers.push(i);
+                }
+            } else {
+                let startPage = Math.max(currentPage - 3, 1);
+                const endPage = Math.min(startPage + maxPageNumbers - 1, maxPage);
 
-            for (let i = startPage; i <= endPage; i++) {
-                pageNumbers.push(i);
-            }
+                if (endPage - startPage < maxPageNumbers - 1) {
+                    startPage = Math.max(endPage - maxPageNumbers + 1, 1);
+                }
 
-            if (startPage > 1) {
-                pageNumbers.unshift(1);
-                if (startPage > 2) {
-                    pageNumbers.splice(1, 0, '...');
+                for (let i = startPage; i <= endPage; i++) {
+                    numbers.push(i);
+                }
+
+                if (startPage > 1) {
+                    numbers.unshift(1);
+                    if (startPage > 2) {
+                        numbers.splice(1, 0, '...');
+                    }
+                }
+
+                if (endPage < maxPage) {
+                    numbers.push(maxPage);
+                    if (endPage < maxPage - 1) {
+                        numbers.splice(numbers.length - 1, 0, '...');
+                    }
                 }
             }
 
-            if (endPage < maxPage) {
-                pageNumbers.push(maxPage);
-                if (endPage < maxPage - 1) {
-                    pageNumbers.splice(pageNumbers.length - 1, 0, '...');
-                }
-            }
-        }
+            return numbers;
+        };
 
-        return pageNumbers;
-    };
-
-    const pageNumbers = getPageNumbers();
+        // Update pageNumbers state with the new values
+        setPageNumbers(getPageNumbers());
+    }, [maxPage, totalRecords, loadedRecords, currentPage]);
 
     return (
         <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>

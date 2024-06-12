@@ -37,14 +37,6 @@ function Navigation() {
                             <TopLevelNavItem href='/about'>About</TopLevelNavItem>
                         </ul>
                     </nav>
-                    <div className='hidden md:block md:h-5 md:w-px md:bg-white/15 md:mx-4' />
-                    {/*TODO: what even */}
-                    <a
-                        className='inline-flex justify-center overflow-hidden text-sm font-medium transition rounded-full bg-zinc-900 py-1 px-3 hover:bg-zinc-700 bg-emerald-400/10 text-emerald-400 ring-1 ring-inset ring-emerald-400/20 hover:bg-emerald-400/10 hover:text-emerald-300 hover:ring-emerald-300'
-                        href='/#'
-                    >
-                        Sign in
-                    </a>
                 </div>
             </div>
         </>

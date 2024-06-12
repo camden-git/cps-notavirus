@@ -51,31 +51,25 @@ function Index() {
                                 <thead>
                                     <th scope='col'>Name</th>
                                     <th scope='col'>Department</th>
+                                    <th scope='col'>Job</th>
                                     <th scope='col'>Annual Income</th>
+                                    <th scope='col'>Last Seen At</th>
                                 </thead>
                                 <tbody>
                                     {payrollData.payrollRecords.map((record: PayrollRecord) => (
                                         <tr key={record.id}>
+                                            <td>{record.name}</td>
+                                            <td>{record.department_name}</td>
+                                            <td>{record.job_title}</td>
+                                            <td>${formatMoney(record.annualSalary)}</td>
                                             <td
                                                 className={
-                                                    'truncate text-sm font-medium leading-6 py-4 pl-4 pr-8 sm:pl-6 lg:pl-8'
+                                                    payrollData.latest_dataframe !== record.last_seen_date
+                                                        ? '!text-rose-400'
+                                                        : ''
                                                 }
                                             >
-                                                {record.name}
-                                            </td>
-                                            <td
-                                                className={
-                                                    'truncate text-sm font-medium leading-6 py-4 pl-4 pr-8 sm:pl-6 lg:pl-8 text-gray-300'
-                                                }
-                                            >
-                                                {record.job_title}
-                                            </td>
-                                            <td
-                                                className={
-                                                    'truncate text-sm font-medium leading-6 py-4 pl-4 pr-8 sm:pl-6 lg:pl-8 text-gray-300'
-                                                }
-                                            >
-                                                ${formatMoney(record.annualSalary)}
+                                                {record.last_seen_date}
                                             </td>
                                         </tr>
                                     ))}

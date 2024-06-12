@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearch } from '../elements/SearchContext';
 
 export const getAPI = (endpoint: string, offset: number, otherArgs?: string) =>
     `${import.meta.env.VITE_API_URL}/${endpoint}?page=${offset}${otherArgs}`;
@@ -26,6 +25,7 @@ export type PayrollRecord = {
     id: number;
     name: string;
     job_title: string;
+    department_name: string;
     annualSalary: number;
     last_seen_date: string;
 };
@@ -34,6 +34,7 @@ export type PayrollInfo = {
     max_page: number;
     total_records: number;
     payrollRecords: PayrollRecord[];
+    latest_dataframe: string;
 };
 
 export type FetchError = {
