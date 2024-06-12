@@ -20,6 +20,7 @@ export type PayrollRecord = {
     name: string;
     job_title: string;
     annualSalary: number;
+    last_seen_date: string;
 };
 
 export type PayrollInfo = {
