@@ -1,14 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearch } from '../elements/SearchContext';
 
-export const getAPI = (endpoint: string, offset: number) => `${import.meta.env.VITE_API_URL}/${endpoint}?page=${offset}`;
+export const getAPI = (endpoint: string, offset: number, otherArgs?: string) =>
+    `${import.meta.env.VITE_API_URL}/${endpoint}?page=${offset}${otherArgs}`;
 
 interface RequestOptions extends RequestInit {
     headers?: Record<string, string>;
 }
 
 // function to make requests to the backend
-const requestBackend = async <T>(url: string, page: number, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(getAPI(url, page), options);
+const requestBackend = async <T>(
+    url: string,
+    page: number,
+    options: RequestOptions = {},
+    otherArgs?: string,
+): Promise<T> => {
+    const response = await fetch(getAPI(url, page, otherArgs), options);
     if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
     }
@@ -34,9 +41,10 @@ export type FetchError = {
     canRetry: boolean;
 };
 
-export const getPayroll = async (page: number) => {
+export const getPayroll = async (page: number, searchTerm?: string): Promise<PayrollInfo | FetchError> => {
     try {
-        const payroll = await requestBackend<PayrollInfo>('payroll', page, { method: 'GET' });
+        const extraArgs = searchTerm ? `&name=${searchTerm}` : '';
+        const payroll = await requestBackend<PayrollInfo>('payroll', page, { method: 'GET' }, extraArgs);
         return payroll;
     } catch (error) {
         return { error: (error as Error).toString(), canRetry: false } as FetchError;
@@ -48,12 +56,13 @@ export const usePayrollPagination = (initialPage: number = 1) => {
     const [payrollData, setPayrollData] = useState<PayrollInfo | null>(null);
     const [error, setError] = useState<FetchError | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const fetchPayroll = useCallback(async (page: number) => {
+    const fetchPayroll = useCallback(async (page: number, searchTerm: string) => {
         setLoading(true);
         setError(null);
 
-        const result = await getPayroll(page);
+        const result = await getPayroll(page, searchTerm);
 
         if ('error' in result) {
             setError(result);
@@ -65,8 +74,16 @@ export const usePayrollPagination = (initialPage: number = 1) => {
     }, []);
 
     useEffect(() => {
-        fetchPayroll(currentPage);
-    }, [currentPage, fetchPayroll]);
+        fetchPayroll(currentPage, searchTerm);
+    }, [currentPage, setCurrentPage, searchTerm, fetchPayroll]);
+
+    const setNameSearch = (term: string) => {
+        // TODO: fix this lol it shouldnt be doing this
+        if (searchTerm !== term) {
+            setSearchTerm(term);
+            setCurrentPage(1);
+        }
+    };
 
     const nextPage = () => {
         if (payrollData && currentPage < payrollData.max_page) {
@@ -86,5 +103,5 @@ export const usePayrollPagination = (initialPage: number = 1) => {
         }
     };
 
-    return { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage };
+    return { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage, setNameSearch };
 };

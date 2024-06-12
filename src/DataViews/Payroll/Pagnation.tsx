@@ -89,7 +89,7 @@ function Pagination({
                             </span>
                         ) : (
                             <button
-                                key={page}
+                                key={index}
                                 onClick={() => gotoPage(page as number)}
                                 aria-current={currentPage === page ? 'page' : undefined}
                                 className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${

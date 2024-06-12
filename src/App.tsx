@@ -4,6 +4,7 @@ import Navigation from './elements/Navigation';
 import HeroPattern from './elements/HeroPattern';
 import Footer from './elements/Footer';
 import About from './About';
+import { SearchProvider } from './elements/SearchContext';
 
 function NoMatch() {
     return (
@@ -19,22 +20,24 @@ function NoMatch() {
 export default function App() {
     return (
         <>
-            <div className='lg:ml-72 xl:ml-80'>
-                <Navigation />
-                <div className='relative px-4 pt-14 sm:px-6 lg:px-8'>
-                    <HeroPattern />
-                    <div className='lg:mr-72 xl:mr-80'>
-                        <main className='py-32 text-white'>
-                            <Routes>
-                                <Route index element={<Index />} />
-                                <Route path='about' element={<About />} />
-                                <Route path='*' element={<NoMatch />} />
-                            </Routes>
-                        </main>
-                        <Footer />
+            <SearchProvider>
+                <div className='lg:ml-72 xl:ml-80'>
+                    <Navigation />
+                    <div className='relative px-4 pt-14 sm:px-6 lg:px-8'>
+                        <HeroPattern />
+                        <div className='lg:mr-72 xl:mr-80'>
+                            <main className='py-32 text-white'>
+                                <Routes>
+                                    <Route index element={<Index />} />
+                                    <Route path='about' element={<About />} />
+                                    <Route path='*' element={<NoMatch />} />
+                                </Routes>
+                            </main>
+                            <Footer />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </SearchProvider>
         </>
     );
 }

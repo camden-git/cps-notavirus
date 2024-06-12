@@ -5,10 +5,27 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { formatMoney } from '../../lib/formatters';
 import Pagination from './Pagnation';
 import Title from '../../elements/Title';
+import { useSearch } from '../../elements/SearchContext';
+import { useEffect } from 'react';
+import debounce from 'lodash.debounce';
 
 function Index() {
-    const { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage } = usePayrollPagination();
+    const { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage, setNameSearch } =
+        usePayrollPagination();
+    const { searchTerm } = useSearch();
 
+    const debounceSetNameSearch = debounce((searchTerm: string) => {
+        setNameSearch(searchTerm);
+    }, 250);
+
+    useEffect(() => {
+        console.log(searchTerm);
+        debounceSetNameSearch(searchTerm);
+
+        return () => {
+            debounceSetNameSearch.cancel();
+        };
+    }, [searchTerm, debounceSetNameSearch]);
     return (
         <>
             <Title
