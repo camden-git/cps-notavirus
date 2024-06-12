@@ -19,7 +19,6 @@ function Index() {
     }, 250);
 
     useEffect(() => {
-        console.log(searchTerm);
         debounceSetNameSearch(searchTerm);
 
         return () => {

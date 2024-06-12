@@ -133,7 +133,6 @@ def max_page(table, per_page):
     
     cursor.execute(f'SELECT COUNT(*) FROM {table}')
     total_records = cursor.fetchone()[0]
-    print(total_records)
     conn.close()
     
     return {'total_records': total_records, 'max_page': (total_records // per_page + 1)}
