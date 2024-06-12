@@ -25,7 +25,7 @@ function Navigation() {
                 <Link to='/'>
                     <Logo />
                 </Link>
-                <div className='hidden lg:block lg:max-w-md lg:flex-auto'>
+                <div className='block max-w-md flex-auto'>
                     <Search />
                 </div>
                 <div className='flex items-center ml-auto'>

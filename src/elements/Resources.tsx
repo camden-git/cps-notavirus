@@ -25,7 +25,7 @@ const resources = [
 
 export function Resources() {
     return (
-        <div className='my-16 xl:max-w-none'>
+        <div className='hidden xl:block my-16 xl:max-w-none'>
             <h2>Resources</h2>
             <div className='mt-4 grid grid-cols-1 gap-8 border-t pt-10 border-white/5 sm:grid-cols-2 xl:grid-cols-4'>
                 {resources.map(resource => (
