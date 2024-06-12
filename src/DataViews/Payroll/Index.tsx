@@ -7,7 +7,7 @@ import Pagination from './Pagnation';
 import Title from '../../elements/Title';
 import { useSearch } from '../../elements/SearchContext';
 import { useEffect } from 'react';
-import debounce from 'lodash.debounce';
+import debounce from 'debounce';
 
 function Index() {
     const { payrollData, error, loading, currentPage, nextPage, prevPage, gotoPage, setNameSearch } =
@@ -22,7 +22,7 @@ function Index() {
         debounceSetNameSearch(searchTerm);
 
         return () => {
-            debounceSetNameSearch.cancel();
+            debounceSetNameSearch.clear();
         };
     }, [searchTerm, debounceSetNameSearch]);
     return (
