@@ -34,60 +34,84 @@ function Index() {
             <Resources />
             <div>
                 {loading ? (
-                    <p>Loading payroll...</p>
+                    <div className='flex mx-auto justify-center'>
+                        <svg
+                            className='animate-spin h-6 w-6 text-white mr-3'
+                            xmlns='http://www.w3.org/2000/svg'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                        >
+                            <circle
+                                className='opacity-25'
+                                cx='12'
+                                cy='12'
+                                r='10'
+                                stroke='currentColor'
+                                strokeWidth='4'
+                            ></circle>
+                            <path
+                                className='opacity-75'
+                                fill='currentColor'
+                                d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                            ></path>
+                        </svg>
+                        <p className='my-auto text-gray-400 font-light'>Loading payroll</p>
+                    </div>
                 ) : error ? (
                     <>
                         <div className='flex mx-auto justify-center'>
-                            <ExclamationTriangleIcon className='text-red-500 h-7 w-7 mr-3' />
+                            <ExclamationTriangleIcon className='text-red-500 h-6 w-6 mr-3' />
                             <p className='my-auto text-red-400 font-300'>Failed to get payroll data</p>
                         </div>
                         <p className='m-auto justify-center text-gray-400 font-light ml-3 text-center'>{error.error}</p>
                     </>
+                ) : payrollData && payrollData.payrollRecords.length > 0 ? (
+                    <>
+                        <Table>
+                            <thead>
+                                <th scope='col'>Name</th>
+                                <th scope='col'>Department</th>
+                                <th scope='col'>Job</th>
+                                <th scope='col'>Annual Income</th>
+                                <th scope='col'>Last Seen At</th>
+                            </thead>
+                            <tbody>
+                                {payrollData.payrollRecords.map((record: PayrollRecord) => (
+                                    <tr key={record.id}>
+                                        <td>{record.name}</td>
+                                        <td>{record.department_name}</td>
+                                        <td>{record.job_title}</td>
+                                        <td>${formatMoney(record.annualSalary)}</td>
+                                        <td
+                                            className={
+                                                payrollData.latest_dataframe !== record.last_seen_date
+                                                    ? '!text-rose-400'
+                                                    : ''
+                                            }
+                                        >
+                                            {record.last_seen_date}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                        <div className='flex items-center justify-between border-t border-white/5 px-4 py-3 sm:px-6'>
+                            {/* TODO: this is terrible, fix it */}
+                            <Pagination
+                                currentPage={currentPage}
+                                maxPage={payrollData.max_page}
+                                loadedRecords={payrollData.payrollRecords.length}
+                                totalRecords={payrollData.total_records}
+                                prevPage={prevPage}
+                                nextPage={nextPage}
+                                gotoPage={gotoPage}
+                            />
+                        </div>
+                    </>
                 ) : (
-                    payrollData && (
-                        <>
-                            <Table>
-                                <thead>
-                                    <th scope='col'>Name</th>
-                                    <th scope='col'>Department</th>
-                                    <th scope='col'>Job</th>
-                                    <th scope='col'>Annual Income</th>
-                                    <th scope='col'>Last Seen At</th>
-                                </thead>
-                                <tbody>
-                                    {payrollData.payrollRecords.map((record: PayrollRecord) => (
-                                        <tr key={record.id}>
-                                            <td>{record.name}</td>
-                                            <td>{record.department_name}</td>
-                                            <td>{record.job_title}</td>
-                                            <td>${formatMoney(record.annualSalary)}</td>
-                                            <td
-                                                className={
-                                                    payrollData.latest_dataframe !== record.last_seen_date
-                                                        ? '!text-rose-400'
-                                                        : ''
-                                                }
-                                            >
-                                                {record.last_seen_date}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                            <div className='flex items-center justify-between border-t border-white/5 px-4 py-3 sm:px-6'>
-                                {/* TODO: this is terrible, fix it */}
-                                <Pagination
-                                    currentPage={currentPage}
-                                    maxPage={payrollData.max_page}
-                                    loadedRecords={payrollData.payrollRecords.length}
-                                    totalRecords={payrollData.total_records}
-                                    prevPage={prevPage}
-                                    nextPage={nextPage}
-                                    gotoPage={gotoPage}
-                                />
-                            </div>
-                        </>
-                    )
+                    <>
+                        <p className='m-auto justify-center text-gray-400 font-light ml-3 text-center'>No results :(</p>
+                    </>
                 )}
             </div>
         </>

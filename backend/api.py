@@ -80,7 +80,8 @@ def get_payroll():
         'current_page': page,
         'max_page': max_page,
         'total_records': total_records,
-        'latest_dataframe': LATEST_DATAFRAME
+        'latest_dataframe': LATEST_DATAFRAME,
+        'name_query': name_query
     })
 
 

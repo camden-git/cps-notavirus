@@ -35,6 +35,7 @@ export type PayrollInfo = {
     total_records: number;
     payrollRecords: PayrollRecord[];
     latest_dataframe: string;
+    name_query: string;
 };
 
 export type FetchError = {
@@ -59,20 +60,25 @@ export const usePayrollPagination = (initialPage: number = 1) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const fetchPayroll = useCallback(async (page: number, searchTerm: string) => {
+    const fetchPayroll = useCallback(async (page: number, search: string) => {
         setLoading(true);
         setError(null);
 
-        const result = await getPayroll(page, searchTerm);
+        const result = await getPayroll(page, search);
 
         if ('error' in result) {
             setError(result);
         } else {
-            setPayrollData(result);
+            if (result.name_query === searchTerm) {
+                //console.debug(`saved response for ${result.name_query} as current search is ${searchTerm}`);
+                setPayrollData(result);
+            } else {
+                //console.debug(`threw out response for ${result.name_query} as current search is ${searchTerm}`);
+            }
         }
 
         setLoading(false);
-    }, []);
+    }, [searchTerm]);
 
     useEffect(() => {
         fetchPayroll(currentPage, searchTerm);
