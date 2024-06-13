@@ -60,25 +60,28 @@ export const usePayrollPagination = (initialPage: number = 1) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const fetchPayroll = useCallback(async (page: number, search: string) => {
-        setLoading(true);
-        setError(null);
+    const fetchPayroll = useCallback(
+        async (page: number, search: string) => {
+            setLoading(true);
+            setError(null);
 
-        const result = await getPayroll(page, search);
+            const result = await getPayroll(page, search);
 
-        if ('error' in result) {
-            setError(result);
-        } else {
-            if (result.name_query === searchTerm) {
-                //console.debug(`saved response for ${result.name_query} as current search is ${searchTerm}`);
-                setPayrollData(result);
+            if ('error' in result) {
+                setError(result);
             } else {
-                //console.debug(`threw out response for ${result.name_query} as current search is ${searchTerm}`);
+                if (result.name_query === searchTerm) {
+                    //console.debug(`saved response for ${result.name_query} as current search is ${searchTerm}`);
+                    setPayrollData(result);
+                } else {
+                    //console.debug(`threw out response for ${result.name_query} as current search is ${searchTerm}`);
+                }
             }
-        }
 
-        setLoading(false);
-    }, [searchTerm]);
+            setLoading(false);
+        },
+        [searchTerm],
+    );
 
     useEffect(() => {
         fetchPayroll(currentPage, searchTerm);
