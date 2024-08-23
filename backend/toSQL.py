@@ -42,6 +42,14 @@ CREATE TABLE IF NOT EXISTS payroll (
 )
 ''')
 
+cursor.execute('CREATE INDEX idx_payroll_name ON payroll(name);')
+cursor.execute('CREATE INDEX idx_payroll_date ON payroll(date);')
+cursor.execute('CREATE INDEX idx_payroll_dept_id ON payroll(dept_id);')
+cursor.execute('CREATE INDEX idx_payroll_job_id ON payroll(job_id);')
+cursor.execute('CREATE INDEX idx_payroll_name_date ON payroll(name, date);') 
+
+conn.commit()
+
 for file_name in os.listdir('data'):
     if file_name.endswith('.xls'):
         file_path = os.path.join('data', file_name)
