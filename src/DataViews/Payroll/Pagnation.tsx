@@ -6,6 +6,7 @@ interface PaginationProps {
     maxPage: number;
     totalRecords: number;
     loadedRecords: number;
+    fetchQueryTime: number;
     prevPage: () => void;
     nextPage: () => void;
     gotoPage: (page: number) => void;
@@ -16,6 +17,7 @@ function Pagination({
     loadedRecords,
     totalRecords,
     maxPage,
+    fetchQueryTime,
     prevPage,
     nextPage,
     gotoPage,
@@ -71,7 +73,7 @@ function Pagination({
                 <p className='text-sm text-gray-300'>
                     Showing <span className='font-medium'>{(currentPage - 1) * loadedRecords + 1}</span> to{' '}
                     <span className='font-medium'>{Math.min(currentPage * loadedRecords, totalRecords)}</span> of{' '}
-                    <span className='font-medium'>{totalRecords}</span> results
+                    <span className='font-medium'>{totalRecords}</span> results (took {fetchQueryTime}s)
                 </p>
             </div>
             <div>

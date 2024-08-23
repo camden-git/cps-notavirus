@@ -36,6 +36,7 @@ export type PayrollInfo = {
     payrollRecords: PayrollRecord[];
     latest_dataframe: string;
     name_query: string;
+    fetch_query_time: number;
 };
 
 export type FetchError = {
@@ -85,7 +86,7 @@ export const usePayrollPagination = (initialPage: number = 1) => {
 
     useEffect(() => {
         fetchPayroll(currentPage, searchTerm);
-    }, [currentPage, setCurrentPage, searchTerm, fetchPayroll]);
+    }, [currentPage, searchTerm, fetchPayroll]);
 
     const setNameSearch = (term: string) => {
         // TODO: fix this lol it shouldnt be doing this
@@ -97,13 +98,13 @@ export const usePayrollPagination = (initialPage: number = 1) => {
 
     const nextPage = () => {
         if (payrollData && currentPage < payrollData.max_page) {
-            setCurrentPage(prev => prev + 1);
+            setCurrentPage((prev) => prev + 1);
         }
     };
 
     const prevPage = () => {
         if (currentPage > 1) {
-            setCurrentPage(prev => prev - 1);
+            setCurrentPage((prev) => prev - 1);
         }
     };
 

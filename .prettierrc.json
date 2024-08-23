@@ -1,22 +1,16 @@
 {
-    "printWidth": 120,
-    "tabWidth": 4,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "jsxSingleQuote": true,
-    "trailingComma": "all",
-    "bracketSpacing": true,
-    "arrowParens": "avoid",
-    "endOfLine": "lf",
-    "overrides": [
-        {
-            "files": ["**/*.md"],
-            "options": {
-                "tabWidth": 2,
-                "useTabs": false,
-                "singleQuote": false
-            }
-        }
-    ]
+	"printWidth": 120,
+	"tabWidth": 4,
+	"useTabs": false,
+	"semi": true,
+	"singleQuote": true,
+	"jsxSingleQuote": true,
+	"endOfLine": "lf",
+	"importOrder": [
+        "^@/DataViews/(.*)$",
+        "^@/elements/(.*)$",
+        "^@/api(.*)$",
+        "^[./]"
+    ],
+    "plugins": ["prettier-plugin-tailwindcss"]
 }

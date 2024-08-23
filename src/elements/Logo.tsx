@@ -15,7 +15,7 @@ function Logo() {
                 />
             </svg>
 
-            <span className='font-bold text-white ml-2'>CPS Pay</span>
+            <span className='ml-2 font-bold text-white'>CPS Pay</span>
         </div>
     );
 }
